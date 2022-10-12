@@ -1,30 +1,29 @@
 clear all; close all;
 
-
-% seleccionar fichero
 [aa bb]=uigetfile({'*.*','All files'});
 
 J=imread([bb aa]);
 I = imrotate(J,-90,'bilinear');
 [M,N,c] = size(I);
 
-negra = zeros(M,N);
+HSV = rgb2hsv(I);
+G = HSV(:,:,3);
 
-for i = 1:1:M
-    for j = 1: 1: N
-        if (I(i, j, 1) > 160) && (I(i, j, 2) > 160) && (I(i, j, 3) > 140)
-            negra(i,j) = 1;
-        end
-    end
-end
+level = graythresh(G);
+negra = imbinarize(G,level);
 
-figure;
-imshow(negra);
-impixelinfo;
+se = strel('disk',8);
+Binaria2 = imopen(negra,se);
+Binaria3 = imclose(Binaria2,se);
+Binaria4 = bwmorph(Binaria3,'clean');
+%figure; imshow(negra);
+%figure; imshow(Binaria2);
+%figure; imshow(Binaria3);
+%figure; imshow(Binaria4);
 
-[Etiquetas,NumRegiones] = bwlabel(negra);
+[Etiquetas,NumRegiones] = bwlabel(Binaria4);
 
-disp(NumRegiones);%17147
+disp(NumRegiones);%V1 => 17147 || V2 => 198
 
 PropRegiones = regionprops(Etiquetas,'all');
 
@@ -81,4 +80,3 @@ for i=1:1:NumRegiones
         %end
     end
 end
-

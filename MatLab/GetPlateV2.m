@@ -18,8 +18,8 @@ sz = netTransfer.Layers(1).InputSize;
 
 [aa bb]=uigetfile({'*.*','All files'});
 
-I=imread([bb aa]);
-%I = imrotate(J,-90,'bilinear');
+J=imread([bb aa]);
+I = imrotate(J,-90,'bilinear');
 [M,N,c] = size(I);
 
 HSV = rgb2hsv(I);
@@ -125,7 +125,19 @@ if YInfIzda > M; YInfIzda = M; end
 XInfDcha =  XSupDcha; 
 YInfDcha =  YInfIzda;
 
-color = 'red'; texto = 'Matricula';
+
+
+%OCR de matlab
+
+IMat = I(YSupIzda:1:YInfIzda,XSupIzda:1:XSupDcha,:); 
+bbox = detectTextCRAFT(IMat,CharacterThreshold=0.3);
+output = ocr(IMat,bbox);
+
+%disp([output.Words]);
+
+%------------
+
+color = 'red'; texto = ['Matrícula: ',output.Words];
 figure; imshow(I); impixelinfo; title('Identificación matricula'); hold on; 
 text(XSupDcha+100,YSupDcha,texto,'Color','y','FontSize',10,'FontWeight','bold')
 line([XSupIzda,XSupDcha],[YSupIzda,YSupDcha],'LineWidth',2,'Color',color)

@@ -126,44 +126,17 @@ XInfDcha =  XSupDcha;
 YInfDcha =  YInfIzda;
 
 
+%% 
 
-%OCR de matlab
+%Deteción automática y reconocimiento de texto usando MSER y OCR
 
 IMat = I(YSupIzda:1:YInfIzda,XSupIzda:1:XSupDcha,:);
-HSV = rgb2hsv(IMat);
-G2 = HSV(:,:,3);
 
-level2 = graythresh(G2);
-negra2 = imbinarize(G2,level2);
+matricula = getTextoMSERYOCR(IMat);
 
-figure; imshow(negra2);
-%bbox = detectTextCRAFT(IMat,CharacterThreshold=0.3);
-bbox = detectTextCRAFT(negra2,CharacterThreshold=0.55);
-%{
-Icorrect = cell(1,size(bbox,1));
-output = cell(1,size(bbox,1));
-recognizedWords = cell(1,size(bbox,1));
-for i=1:size(bbox,1)
-    roi = bbox(i,:);
-    Icrop = IMat(roi(2):roi(2)+roi(4),roi(1):roi(1)+roi(3),:);
-    Ipreprocess = rgb2gray(Icrop);
-    Ipreprocess = imadjust(Ipreprocess);
-    Isegment = imbinarize(Ipreprocess);   
-    Isegment = padarray(Isegment,[15 15],0,'both');
-    se = strel('square',2);
-    Icorrect{i} = imerode(Isegment,se);    
-    output{i} = ocr(Icorrect{i});
-    recognizedWords{i} = [deblank(output{i}.Text)];
-end
-disp(recognizedWords);
-%}
-output = ocr(negra2,bbox);
+%% 
 
-%disp([output.Words]);
-
-%------------
-
-color = 'red'; texto = ['Matrícula: ',output.Words];
+color = 'red'; texto = ['Matrícula: ',matricula.Text];
 figure; imshow(I); impixelinfo; title('Identificación matricula'); hold on; 
 text(XSupDcha+100,YSupDcha,texto,'Color','y','FontSize',10,'FontWeight','bold')
 line([XSupIzda,XSupDcha],[YSupIzda,YSupDcha],'LineWidth',2,'Color',color)

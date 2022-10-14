@@ -130,40 +130,32 @@ YInfDcha =  YInfIzda;
 %OCR de matlab
 
 IMat = I(YSupIzda:1:YInfIzda,XSupIzda:1:XSupDcha,:);
+%imwrite(IMat,"D:\GitHub\TrabajoFinGrado\MatLab\matricula.jpg");
 HSV = rgb2hsv(IMat);
 G2 = HSV(:,:,3);
 
 level2 = graythresh(G2);
 negra2 = imbinarize(G2,level2);
-
-figure; imshow(negra2);
-%bbox = detectTextCRAFT(IMat,CharacterThreshold=0.3);
+figure;imshow(negra2);
 bbox = detectTextCRAFT(negra2,CharacterThreshold=0.55);
-%{
-Icorrect = cell(1,size(bbox,1));
-output = cell(1,size(bbox,1));
-recognizedWords = cell(1,size(bbox,1));
-for i=1:size(bbox,1)
-    roi = bbox(i,:);
-    Icrop = IMat(roi(2):roi(2)+roi(4),roi(1):roi(1)+roi(3),:);
-    Ipreprocess = rgb2gray(Icrop);
-    Ipreprocess = imadjust(Ipreprocess);
-    Isegment = imbinarize(Ipreprocess);   
-    Isegment = padarray(Isegment,[15 15],0,'both');
-    se = strel('square',2);
-    Icorrect{i} = imerode(Isegment,se);    
-    output{i} = ocr(Icorrect{i});
-    recognizedWords{i} = [deblank(output{i}.Text)];
-end
-disp(recognizedWords);
-%}
-output = ocr(negra2,bbox);
+results = ocr(negra2,bbox, 'CharacterSet','0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ','TextLayout','Block');
+disp([results.Text]);
 
-%disp([output.Words]);
+%{
+% Sort the character confidences.
+[sortedConf, sortedIndex] = sort(results.CharacterConfidences, 'descend');
+
+% Keep indices associated with non-NaN confidences values.
+indexesNaNsRemoved = sortedIndex( ~isnan(sortedConf) );
+
+% Get the top seven indexes.
+topTenIndexes = indexesNaNsRemoved(1:7);
+
+%}
 
 %------------
 
-color = 'red'; texto = ['Matrícula: ',output.Words];
+color = 'red'; texto = ['Matrícula: ',results.Text];
 figure; imshow(I); impixelinfo; title('Identificación matricula'); hold on; 
 text(XSupDcha+100,YSupDcha,texto,'Color','y','FontSize',10,'FontWeight','bold')
 line([XSupIzda,XSupDcha],[YSupIzda,YSupDcha],'LineWidth',2,'Color',color)

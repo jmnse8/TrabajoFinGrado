@@ -23,8 +23,9 @@ I = imrotate(I,-90,'bilinear');
 [M,N,c] = size(I);
 
 HSV = rgb2hsv(I);
+%figure; imshow(HSV);
 G = HSV(:,:,3);
-
+%figure; imshow(G);
 level = graythresh(G);
 negra = imbinarize(G,level);
 

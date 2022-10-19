@@ -19,7 +19,7 @@ sz = netTransfer.Layers(1).InputSize;
 [aa bb]=uigetfile({'*.*','All files'});
 
 I=imread([bb aa]);
-I = imrotate(I,-90,'bilinear');
+%I = imrotate(I,-90,'bilinear');
 [M,N,c] = size(I);
 
 HSV = rgb2hsv(I);

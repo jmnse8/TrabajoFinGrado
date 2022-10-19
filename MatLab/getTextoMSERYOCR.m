@@ -7,6 +7,12 @@ function ocrtxt = getTextoMSERYOCR(IMat)
     
     
     I = im2gray(IMat);
+    HSV3 = rgb2hsv(IMat);
+    G3 = HSV3(:,:,3);
+
+    level3 = graythresh(G3);
+    negra3 = imbinarize(G3,level3);
+    %figure; imshow(negra3);
     
     % Detect MSER regions.
     [mserRegions, mserConnComp] = detectMSERFeatures(I, ... 
@@ -106,15 +112,15 @@ function ocrtxt = getTextoMSERYOCR(IMat)
     textBBoxes(numRegionsInGroup == 1, :) = [];
     
     % Show the final text detection result.
-    ITextRegion = insertShape(IMat, 'rectangle', textBBoxes,'LineWidth',3);
+    %ITextRegion = insertShape(IMat, 'rectangle', textBBoxes,'LineWidth',3);
     
-    figure
-    imshow(ITextRegion)
-    title('Detected Text')
+    %figure
+    %imshow(ITextRegion)
+    %title('Detected Text')
     
     
     
-    ocrtxt = ocr(I, textBBoxes, 'CharacterSet','0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ','TextLayout','Block');
+    ocrtxt = ocr(negra3, textBBoxes, 'CharacterSet','0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ','TextLayout','Block');
     %disp([ocrtxt.Text]);
 
 end
